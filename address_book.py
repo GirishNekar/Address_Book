@@ -9,7 +9,7 @@
 import re
 import mylogging as log
 
-logger = log.logger_init('UC9')
+logger = log.logger_init('UC10')
 
 class ContactPerson:
     """
@@ -152,9 +152,10 @@ class AddressBook:
         else:
             print("Contact not found.")
 
+
     def view_by_city(self):
         """
-        Function: View all contacts by city.
+        Function: View all contacts by city and count the number of contacts in each city.
         
         Parameter: self
         
@@ -163,15 +164,16 @@ class AddressBook:
         city = self.validate_input("Enter city to view contacts: ", r'^[A-Za-z\s]+$', "Invalid city name. Please use only letters.")
         contacts_found = [contact for contact in self.contacts.values() if contact.city.lower() == city.lower()]
         if contacts_found:
-            print("\nContacts in city '{}':".format(city))
+            print(f"\nContacts in city '{city}':")
             for index, contact in enumerate(contacts_found, start=1):
                 print(f"\nContact {index}:\n{contact}")
+            print(f"\nTotal contacts in '{city}': {len(contacts_found)}")
         else:
             print(f"No contacts found in city '{city}'.")
 
     def view_by_state(self):
         """
-        Function: View all contacts by state.
+        Function: View all contacts by state and count the number of contacts in each state.
         
         Parameter: self
         
@@ -180,9 +182,10 @@ class AddressBook:
         state = self.validate_input("Enter state to view contacts: ", r'^[A-Za-z\s]+$', "Invalid state name. Please use only letters.")
         contacts_found = [contact for contact in self.contacts.values() if contact.state.lower() == state.lower()]
         if contacts_found:
-            print("\nContacts in state '{}':".format(state))
+            print(f"\nContacts in state '{state}':")
             for index, contact in enumerate(contacts_found, start=1):
                 print(f"\nContact {index}:\n{contact}")
+            print(f"\nTotal contacts in '{state}': {len(contacts_found)}")
         else:
             print(f"No contacts found in state '{state}'.")
 
@@ -220,8 +223,8 @@ class AddressBook:
             print("3. Display Contacts")
             print("4. Edit Contact")
             print("5. Delete Contact")
-            print("6. View Contacts by City")
-            print("7. View Contacts by State")
+            print("6. View Contacts by City and total number of persons in that City")
+            print("7. View Contacts by State and totoal number of persons in that State")
             print("8. Go Back")
             choice = input("Enter your choice: ")
 
