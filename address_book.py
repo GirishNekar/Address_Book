@@ -3,18 +3,19 @@
 @Date: 2024-09-09
 @Last Modified by: Girish
 @Last Modified time: 2024-09-09
-@Title : UC2-Ability to add a new Contact to Address Book
+@Title : Ability to add and edit a Contact in Address Book
 """
 
 import re
 import mylogging as log
 
-logger = log.logger_init('UC2')
+logger = log.logger_init('UC3')
 
 class ContactPerson:
-    
-    ## Represents a contact person with details such as first name, last name, address, city, state, zip, phone number, and email.
-    
+    """
+    Class: ContactPerson
+    Represents a contact person with details such as first name, last name, address, city, state, zip, phone number, and email.
+    """
     def __init__(self, first_name, last_name, address, city, state, zip_code, phone_number, email):
         self.first_name = first_name
         self.last_name = last_name
@@ -28,28 +29,30 @@ class ContactPerson:
     def __str__(self):
         return (
             f"Name: {self.first_name} {self.last_name}\n"
-            f"Address: {self.address}, {self.city}, {self.state} - {self.zip_code}\n"
+            f"Address: {self.address}"
+            f"City: {self.city}\n"
+            f"State: {self.state}\n"
+            f"Zip code: {self.zip_code}\n"
             f"Phone Number: {self.phone_number}\n"
             f"Email: {self.email}"
         )
 
 class AddressBook:
-
-    # Manages a collection of ContactPerson objects and user interactions.
-    
+    """
+    Class: AddressBook
+    Manages a collection of ContactPerson objects and user interactions.
+    """
     def __init__(self):
         self.contacts = []
 
     def add_contact(self):
-        
         """
         Function: Add a new contact to the Address Book by collecting user input.
         
-        Parameter : self
+        Parameter: self
         
-        Returns : None
+        Returns: None
         """
-        
         first_name = self.validate_input("Enter first name (Eg : Girish): ", r'^[A-Z][A-Za-z]{2,}$', "Invalid first name. Please use only letters.")
         last_name = self.validate_input("Enter last name(Eg : Nekar): ", r'^[A-Z][A-Za-z]{2,}$', "Invalid last name. Please use only letters.")
         address = input("Enter address: ")
@@ -67,15 +70,52 @@ class AddressBook:
         """
         Function: Display all contacts in the Address Book.
         
-        Parameter : self
+        Parameter: self
         
-        Returns : None
+        Returns: None
         """
         if not self.contacts:
             print("Address Book is empty.")
         else:
             for index, contact in enumerate(self.contacts, start=1):
                 print(f"\nContact {index}:\n{contact}")
+
+    def edit_contact(self):
+        """
+        Function: Edit an existing contact's details based on their first name.
+        
+        Parameter: self
+        
+        Returns: None
+        """
+        first_name = input("Enter the first name of the contact you want to edit: ")
+        for contact in self.contacts:
+            if contact.first_name == first_name:
+                print("\nCurrent details of the contact:")
+                print(contact)
+                print("\nEnter new details (leave blank to keep current value):")
+                new_first_name = input(f"New Last Name (Current: {contact.last_name}): ") or contact.last_name
+                new_last_name = input(f"New Last Name (Current: {contact.last_name}): ") or contact.last_name
+                new_address = input(f"New Address (Current: {contact.address}): ") or contact.address
+                new_city = input(f"New City (Current: {contact.city}): ") or contact.city
+                new_state = input(f"New State (Current: {contact.state}): ") or contact.state
+                new_zip_code = input(f"New Zip Code (Current: {contact.zip_code}): ") or contact.zip_code
+                new_phone_number = input(f"New Phone Number (Current: {contact.phone_number}): ") or contact.phone_number
+                new_email = input(f"New Email (Current: {contact.email}): ") or contact.email
+
+                # Update the contact with new details
+                contact.first_name = new_first_name
+                contact.last_name = new_last_name
+                contact.address = new_address
+                contact.city = new_city
+                contact.state = new_state
+                contact.zip_code = new_zip_code
+                contact.phone_number = new_phone_number
+                contact.email = new_email
+
+                logger.info(f"Contact {first_name} updated successfully.")
+                return
+        print("Contact not found.")
 
     @staticmethod
     def validate_input(prompt, pattern, error_message):
@@ -99,22 +139,19 @@ class AddressBook:
         
 
     def manage(self):
-        
-        
         """
         Function: Handles user interactions for managing the Address Book.
         
-        Parameter : None
+        Parameter: None
         
-        Returns : None
+        Returns: None
         """
-        
-
         while True:
-            print("\nMenu:")
+            print("\nManage Address Book:")
             print("1. Add a new contact")
             print("2. Display all contacts")
-            print("3. Exit")
+            print("3. Edit an existing contact")
+            print("4. Exit")
             choice = input("Enter your choice: ")
 
             if choice == '1':
@@ -122,6 +159,8 @@ class AddressBook:
             elif choice == '2':
                 self.display_contacts()
             elif choice == '3':
+                self.edit_contact()
+            elif choice == '4':
                 print("Exiting the Address Book")
                 break
             else:
@@ -131,7 +170,5 @@ def main():
     address_book = AddressBook()
     address_book.manage()
 
-
 if __name__ == "__main__":
     main()
-
