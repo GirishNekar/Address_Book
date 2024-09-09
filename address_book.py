@@ -3,13 +3,13 @@
 @Date: 2024-09-09
 @Last Modified by: Girish
 @Last Modified time: 2024-09-09
-@Title : Ability to add, edit, delete, and manage multiple Contacts in Address Book and search based on the 
+@Title : Ability to add, edit, delete, and manage multiple Contacts in Address Book and search and view based on the city and state
 """
 
 import re
 import mylogging as log
 
-logger = log.logger_init('UC7')
+logger = log.logger_init('UC9')
 
 class ContactPerson:
     """
@@ -152,6 +152,40 @@ class AddressBook:
         else:
             print("Contact not found.")
 
+    def view_by_city(self):
+        """
+        Function: View all contacts by city.
+        
+        Parameter: self
+        
+        Returns: None
+        """
+        city = self.validate_input("Enter city to view contacts: ", r'^[A-Za-z\s]+$', "Invalid city name. Please use only letters.")
+        contacts_found = [contact for contact in self.contacts.values() if contact.city.lower() == city.lower()]
+        if contacts_found:
+            print("\nContacts in city '{}':".format(city))
+            for index, contact in enumerate(contacts_found, start=1):
+                print(f"\nContact {index}:\n{contact}")
+        else:
+            print(f"No contacts found in city '{city}'.")
+
+    def view_by_state(self):
+        """
+        Function: View all contacts by state.
+        
+        Parameter: self
+        
+        Returns: None
+        """
+        state = self.validate_input("Enter state to view contacts: ", r'^[A-Za-z\s]+$', "Invalid state name. Please use only letters.")
+        contacts_found = [contact for contact in self.contacts.values() if contact.state.lower() == state.lower()]
+        if contacts_found:
+            print("\nContacts in state '{}':".format(state))
+            for index, contact in enumerate(contacts_found, start=1):
+                print(f"\nContact {index}:\n{contact}")
+        else:
+            print(f"No contacts found in state '{state}'.")
+
     @staticmethod
     def validate_input(prompt, pattern, error_message):
         """
@@ -186,7 +220,9 @@ class AddressBook:
             print("3. Display Contacts")
             print("4. Edit Contact")
             print("5. Delete Contact")
-            print("6. Go Back")
+            print("6. View Contacts by City")
+            print("7. View Contacts by State")
+            print("8. Go Back")
             choice = input("Enter your choice: ")
 
             if choice == '1':
@@ -200,10 +236,13 @@ class AddressBook:
             elif choice == '5':
                 self.delete_contact()
             elif choice == '6':
+                self.view_by_city()
+            elif choice == '7':
+                self.view_by_state()
+            elif choice == '8':
                 break
             else:
                 print("Invalid choice. Please try again.")
-
 class AddressBookManager:
     """
     Class: AddressBookManager
