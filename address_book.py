@@ -9,7 +9,7 @@
 import re
 import mylogging as log
 
-logger = log.logger_init('UC5')
+logger = log.logger_init('UC6')
 
 class ContactPerson:
     """
@@ -199,9 +199,84 @@ class AddressBook:
             else:
                 print("Invalid choice. Please try again.")
 
+class AddressBookManager:
+    """
+    Class: AddressBookManager
+    Manages multiple AddressBook instances, each identified by a unique name.
+    """
+    def __init__(self):
+        self.address_books = {}
+
+    def create_address_book(self):
+        """
+        Function: Create a new Address Book with a unique name.
+        
+        Parameter: self
+        
+        Returns: None
+        """
+        name = input("Enter the name for the new Address Book: ").strip()
+        if name in self.address_books:
+            print("An Address Book with this name already exists.")
+        else:
+            self.address_books[name] = AddressBook()
+            logger.info(f"Address Book '{name}' created successfully.")
+
+    def select_address_book(self):
+        """
+        Function: Select an Address Book from the available Address Books.
+        
+        Parameter: self
+        
+        Returns: AddressBook instance
+        """
+        if not self.address_books:
+            print("No Address Books available.")
+            return None
+
+        print("Available Address Books:")
+        for index, name in enumerate(self.address_books, start=1):
+            print(f"{index}. {name}")
+
+        choice = input("Enter the number of the Address Book you want to manage: ")
+        try:
+            index = int(choice) - 1
+            name = list(self.address_books.keys())[index]
+            return self.address_books[name]
+        except (ValueError, IndexError):
+            print("Invalid choice. Please try again.")
+            return None
+
+    def manage(self):
+        """
+        Function: Handles user interactions for managing Address Books and their contacts.
+        
+        Parameter: None
+        
+        Returns: None
+        """
+        while True:
+            print("\nMenu:")
+            print("1. Create a new Address Book")
+            print("2. Manage an existing Address Book")
+            print("3. Exit")
+            choice = input("Enter your choice: ")
+
+            if choice == '1':
+                self.create_address_book()
+            elif choice == '2':
+                address_book = self.select_address_book()
+                if address_book:
+                    address_book.manage()
+            elif choice == '3':
+                print("Exiting Address Book Manager")
+                break
+            else:
+                print("Invalid choice. Please try again.")
+
 def main():
-    address_book = AddressBook()
-    address_book.manage()
+    manager = AddressBookManager()
+    manager.manage()
 
 if __name__ == "__main__":
     main()
