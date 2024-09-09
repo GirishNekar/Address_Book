@@ -3,13 +3,13 @@
 @Date: 2024-09-09
 @Last Modified by: Girish
 @Last Modified time: 2024-09-09
-@Title : Ability to add, edit, and delete a Contact in Address Book
+@Title : Ability to add, edit, delete, and manage multiple Contacts in Address Book
 """
 
 import re
 import mylogging as log
 
-logger = log.logger_init('UC4')
+logger = log.logger_init('UC5')
 
 class ContactPerson:
     """
@@ -62,6 +62,21 @@ class AddressBook:
         contact = ContactPerson(first_name, last_name, address, city, state, zip_code, phone_number, email)
         self.contacts.append(contact)
         logger.info("Contact added successfully.")
+
+    def add_multiple_contacts(self):
+        """
+        Function: Add multiple contacts to the Address Book by collecting user input repeatedly.
+        
+        Parameter: self
+        
+        Returns: None
+        """
+        while True:
+            print("\nAdding a new contact.")
+            self.add_contact()
+            more_contacts = input("Do you want to add another contact? (yes/no): ").strip().lower()
+            if more_contacts != 'yes':
+                break
 
     def display_contacts(self):
         """
@@ -161,21 +176,24 @@ class AddressBook:
         while True:
             print("\nMenu:")
             print("1. Add a new contact")
-            print("2. Display all contacts")
-            print("3. Edit an existing contact")
-            print("4. Delete a contact")
-            print("5. Exit")
+            print("2. Add multiple contacts")
+            print("3. Display all contacts")
+            print("4. Edit an existing contact")
+            print("5. Delete a contact")
+            print("6. Exit")
             choice = input("Enter your choice: ")
 
             if choice == '1':
                 self.add_contact()
             elif choice == '2':
-                self.display_contacts()
+                self.add_multiple_contacts()
             elif choice == '3':
-                self.edit_contact()
+                self.display_contacts()
             elif choice == '4':
-                self.delete_contact()
+                self.edit_contact()
             elif choice == '5':
+                self.delete_contact()
+            elif choice == '6':
                 print("Exiting the Address Book")
                 break
             else:
