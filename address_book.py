@@ -1,3 +1,11 @@
+"""
+@Author: Girish
+@Date: 2024-09-09
+@Last Modified by: Girish
+@Last Modified time: 2024-09-09
+@Title : Ability to add, edit, delete, and manage multiple Contacts in Address Book and search based on the 
+"""
+
 import re
 import mylogging as log
 
@@ -36,8 +44,7 @@ class ContactPerson:
 
 class AddressBook:
     """
-    Class: AddressBookno
-    
+    Class: AddressBook
     Manages a collection of ContactPerson objects and user interactions.
     """
     def __init__(self):
@@ -113,7 +120,7 @@ class AddressBook:
             print("\nCurrent details of the contact:")
             print(contact)
             print("\nEnter new details (leave blank to keep current value):")
-            new_first_name = input(f"New Last Name (Current: {contact.first_name}): ") or contact.first_name
+            new_first_name = input(f"New First Name (Current: {contact.first_name}): ") or contact.first_name
             new_last_name = input(f"New Last Name (Current: {contact.last_name}): ") or contact.last_name
             new_address = input(f"New Address (Current: {contact.address}): ") or contact.address
             new_city = input(f"New City (Current: {contact.city}): ") or contact.city
@@ -218,22 +225,73 @@ class AddressBookManager:
             print("Address Book already exists.")
         else:
             self.address_books[name] = AddressBook()
-            print(f"Address Book '{name}' created.")
+            print(f"Address Book '{name}' created successfully.")
 
     def select_address_book(self):
         """
-        Function: Select an Address Book by name for management.
+        Function: Select an Address Book by name and manage it.
         
         Parameter: self
         
-        Returns: AddressBook or None
+        Returns: None
         """
-        name = input("Enter the name of the Address Book you want to manage: ")
-        return self.address_books.get(name, None)
+        if not self.address_books:
+            print("No Address Books available. Please create one first.")
+            return
+
+        print("\nAvailable Address Books:")
+        for index, name in enumerate(self.address_books.keys(), start=1):
+            print(f"{index}. {name}")
+
+        choice = input("Enter the number of the Address Book you want to select (or 'q' to quit): ")
+        if choice.lower() == 'q':
+            return
+
+        try:
+            index = int(choice) - 1
+            if 0 <= index < len(self.address_books):
+                selected_name = list(self.address_books.keys())[index]
+                address_book = self.address_books[selected_name]
+                print(f"Selected Address Book: {selected_name}")
+                address_book.manage()
+            else:
+                print("Invalid choice.")
+        except ValueError:
+            print("Invalid input. Please enter a number.")
+
+    def search_contacts(self):
+        """
+        Function: Search for contacts by city or state across all Address Books.
+        
+        Parameter: self
+        
+        Returns: None
+        """
+        search_type = input("Search by (1) City or (2) State? Enter 1 or 2: ")
+        if search_type not in {'1', '2'}:
+            print("Invalid choice.")
+            return
+
+        search_term = input("Enter the search term: ").strip()
+
+        found_contacts = []
+        for address_book_name, address_book in self.address_books.items():
+            for contact in address_book.contacts.values():
+                if (search_type == '1' and contact.city.lower() == search_term.lower()) or \
+                   (search_type == '2' and contact.state.lower() == search_term.lower()):
+                    found_contacts.append((address_book_name, contact))
+
+        if found_contacts:
+            print("\nSearch Results:")
+            for book_name, contact in found_contacts:
+                print(f"\nAddress Book: {book_name}")
+                print(contact)
+        else:
+            print("No contacts found.")
 
     def manage(self):
         """
-        Function: Manage the Address Book system, providing options to create or select Address Books.
+        Function: Manage the Address Book Manager, providing options to create, select, search Address Books.
         
         Parameter: self
         
@@ -242,19 +300,18 @@ class AddressBookManager:
         while True:
             print("\nAddress Book Manager Menu:")
             print("1. Create Address Book")
-            print("2. Manage Existing Address Book")
-            print("3. Exit")
+            print("2. Select Address Book")
+            print("3. Search Contacts")
+            print("4. Exit")
             choice = input("Enter your choice: ")
 
             if choice == '1':
                 self.create_address_book()
             elif choice == '2':
-                address_book = self.select_address_book()
-                if address_book:
-                    address_book.manage()
-                else:
-                    print("Address Book not found.")
+                self.select_address_book()
             elif choice == '3':
+                self.search_contacts()
+            elif choice == '4':
                 break
             else:
                 print("Invalid choice. Please try again.")
