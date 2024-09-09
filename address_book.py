@@ -1,15 +1,7 @@
-"""
-@Author: Girish
-@Date: 2024-09-09
-@Last Modified by: Girish
-@Last Modified time: 2024-09-09
-@Title : Ability to add, edit, delete, and manage multiple Contacts in Address Book
-"""
-
 import re
 import mylogging as log
 
-logger = log.logger_init('UC6')
+logger = log.logger_init('UC7')
 
 class ContactPerson:
     """
@@ -20,8 +12,8 @@ class ContactPerson:
         self.first_name = first_name
         self.last_name = last_name
         self.address = address
-        self.city = city 
-        self.state = state 
+        self.city = city
+        self.state = state
         self.zip_code = zip_code
         self.phone_number = phone_number
         self.email = email
@@ -34,13 +26,22 @@ class ContactPerson:
             f"Email: {self.email}"
         )
 
+    def __eq__(self, other):
+        if isinstance(other, ContactPerson):
+            return self.first_name == other.first_name
+        return False
+
+    def __hash__(self):
+        return hash(self.first_name)
+
 class AddressBook:
     """
-    Class: AddressBook
+    Class: AddressBookno
+    
     Manages a collection of ContactPerson objects and user interactions.
     """
     def __init__(self):
-        self.contacts = []
+        self.contacts = {}
 
     def add_contact(self):
         """
@@ -51,17 +52,23 @@ class AddressBook:
         Returns: None
         """
         first_name = self.validate_input("Enter first name (Eg : Girish): ", r'^[A-Z][A-Za-z]{2,}$', "Invalid first name. Please use only letters.")
-        last_name = self.validate_input("Enter last name(Eg : Nekar): ", r'^[A-Z][A-Za-z]{2,}$', "Invalid last name. Please use only letters.")
+        last_name = self.validate_input("Enter last name (Eg : Nekar): ", r'^[A-Z][A-Za-z]{2,}$', "Invalid last name. Please use only letters.")
         address = input("Enter address: ")
         city = self.validate_input("Enter city: ", r'^[A-Za-z\s]+$', "Invalid city name. Please use only letters.")
         state = self.validate_input("Enter state: ", r'^[A-Za-z\s]+$', "Invalid state name. Please use only letters.")
         zip_code = self.validate_input("Enter zip code: ", r'^\d{6,}$', "Invalid zip code. Please enter a 6-digit number.")
-        phone_number = self.validate_input("Enter phone number(Eg : 87 4567890654): ", r'^\d{2} \d{10}$', "Invalid phone number. Please enter a 10-digit number.")
-        email = self.validate_input("Enter email(Eg : gmnekar45@gmail.com): ", r'^[a-zA-Z0-9]+(?:[._%+-][a-zA-Z0-9]+)*@[a-zA-Z0-9-]+\.[a-zA-Z]{2,}(?:\.[a-zA-Z]{2,})?$', "Invalid email format.")
+        phone_number = self.validate_input("Enter phone number (Eg : 87 4567890654): ", r'^\d{2} \d{10}$', "Invalid phone number. Please enter a 10-digit number.")
+        email = self.validate_input("Enter email (Eg : gmnekar45@gmail.com): ", r'^[a-zA-Z0-9]+(?:[._%+-][a-zA-Z0-9]+)*@[a-zA-Z0-9-]+\.[a-zA-Z]{2,}(?:\.[a-zA-Z]{2,})?$', "Invalid email format.")
 
         contact = ContactPerson(first_name, last_name, address, city, state, zip_code, phone_number, email)
-        self.contacts.append(contact)
-        logger.info("Contact added successfully.")
+        
+        # Check for duplicate contact based on first name
+        if first_name in self.contacts:
+            print("A contact with this first name already exists.")
+            logger.info(f"Attempted to add duplicate contact with first name: {first_name}")
+        else:
+            self.contacts[first_name] = contact
+            logger.info("Contact added successfully.")
 
     def add_multiple_contacts(self):
         """
@@ -89,7 +96,7 @@ class AddressBook:
         if not self.contacts:
             print("Address Book is empty.")
         else:
-            for index, contact in enumerate(self.contacts, start=1):
+            for index, contact in enumerate(self.contacts.values(), start=1):
                 print(f"\nContact {index}:\n{contact}")
 
     def edit_contact(self):
@@ -101,32 +108,27 @@ class AddressBook:
         Returns: None
         """
         first_name = input("Enter the first name of the contact you want to edit: ")
-        for contact in self.contacts:
-            if contact.first_name == first_name:
-                print("\nCurrent details of the contact:")
-                print(contact)
-                print("\nEnter new details (leave blank to keep current value):")
+        if first_name in self.contacts:
+            contact = self.contacts[first_name]
+            print("\nCurrent details of the contact:")
+            print(contact)
+            print("\nEnter new details (leave blank to keep current value):")
+            new_first_name = input(f"New Last Name (Current: {contact.first_name}): ") or contact.first_name
+            new_last_name = input(f"New Last Name (Current: {contact.last_name}): ") or contact.last_name
+            new_address = input(f"New Address (Current: {contact.address}): ") or contact.address
+            new_city = input(f"New City (Current: {contact.city}): ") or contact.city
+            new_state = input(f"New State (Current: {contact.state}): ") or contact.state
+            new_zip_code = input(f"New Zip Code (Current: {contact.zip_code}): ") or contact.zip_code
+            new_phone_number = input(f"New Phone Number (Current: {contact.phone_number}): ") or contact.phone_number
+            new_email = input(f"New Email (Current: {contact.email}): ") or contact.email
 
-                new_last_name = input(f"New Last Name (Current: {contact.last_name}): ") or contact.last_name
-                new_address = input(f"New Address (Current: {contact.address}): ") or contact.address
-                new_city = input(f"New City (Current: {contact.city}): ") or contact.city
-                new_state = input(f"New State (Current: {contact.state}): ") or contact.state
-                new_zip_code = input(f"New Zip Code (Current: {contact.zip_code}): ") or contact.zip_code
-                new_phone_number = input(f"New Phone Number (Current: {contact.phone_number}): ") or contact.phone_number
-                new_email = input(f"New Email (Current: {contact.email}): ") or contact.email
+            # Update contact details
+            updated_contact = ContactPerson(new_first_name, new_last_name, new_address, new_city, new_state, new_zip_code, new_phone_number, new_email)
+            self.contacts[first_name] = updated_contact
 
-                # Update the contact with new details
-                contact.last_name = new_last_name
-                contact.address = new_address
-                contact.city = new_city
-                contact.state = new_state
-                contact.zip_code = new_zip_code
-                contact.phone_number = new_phone_number
-                contact.email = new_email
-
-                logger.info(f"Contact {first_name} updated successfully.")
-                return
-        print("Contact not found.")
+            logger.info(f"Contact {first_name} updated successfully.")
+        else:
+            print("Contact not found.")
 
     def delete_contact(self):
         """
@@ -137,50 +139,47 @@ class AddressBook:
         Returns: None
         """
         first_name = input("Enter the first name of the contact you want to delete: ")
-        for index, contact in enumerate(self.contacts):
-            if contact.first_name == first_name:
-                del self.contacts[index]
-                logger.info(f"Contact {first_name} deleted successfully.")
-                return
-        print("Contact not found.")
+        if first_name in self.contacts:
+            del self.contacts[first_name]
+            logger.info(f"Contact {first_name} deleted successfully.")
+        else:
+            print("Contact not found.")
 
     @staticmethod
     def validate_input(prompt, pattern, error_message):
         """
-        Function: Validate user input based on a provided regular expression pattern.
-
-        Parameters:
-            prompt : The prompt message to display to the user.
-            pattern : The regular expression pattern to validate input against.
-            error_message : The error message to display if input is invalid.
-
-        Returns:
-            str: The validated input from the user.
+        Function: Validate user input based on a regular expression pattern.
+        
+        Parameter: 
+        - prompt (str): The prompt to display to the user.
+        - pattern (str): The regular expression pattern to validate the input.
+        - error_message (str): The error message to display for invalid input.
+        
+        Returns: str
         """
-        for attempts in range(3):
-            user_input = input(prompt)
+        while True:
+            user_input = input(prompt).strip()
             if re.match(pattern, user_input):
                 return user_input
-            print(error_message)
-        logger.info("Session expires, try again after some time.")
-        
+            else:
+                print(error_message)
 
     def manage(self):
         """
-        Function: Handles user interactions for managing the Address Book.
+        Function: Manage the Address Book system, providing options to add, display, edit, or delete contacts.
         
-        Parameter: None
+        Parameter: self
         
         Returns: None
         """
         while True:
-            print("\nMenu:")
-            print("1. Add a new contact")
-            print("2. Add multiple contacts")
-            print("3. Display all contacts")
-            print("4. Edit an existing contact")
-            print("5. Delete a contact")
-            print("6. Exit")
+            print("\nAddress Book Menu:")
+            print("1. Add Contact")
+            print("2. Add Multiple Contacts")
+            print("3. Display Contacts")
+            print("4. Edit Contact")
+            print("5. Delete Contact")
+            print("6. Go Back")
             choice = input("Enter your choice: ")
 
             if choice == '1':
@@ -194,7 +193,6 @@ class AddressBook:
             elif choice == '5':
                 self.delete_contact()
             elif choice == '6':
-                print("Exiting the Address Book")
                 break
             else:
                 print("Invalid choice. Please try again.")
@@ -202,63 +200,49 @@ class AddressBook:
 class AddressBookManager:
     """
     Class: AddressBookManager
-    Manages multiple AddressBook instances, each identified by a unique name.
+    Manages multiple Address Books, allowing creation, selection, and management of individual Address Books.
     """
     def __init__(self):
         self.address_books = {}
 
     def create_address_book(self):
         """
-        Function: Create a new Address Book with a unique name.
+        Function: Create a new Address Book and add it to the manager.
         
         Parameter: self
         
         Returns: None
         """
-        name = input("Enter the name for the new Address Book: ").strip()
+        name = input("Enter the name of the new Address Book: ")
         if name in self.address_books:
-            print("An Address Book with this name already exists.")
+            print("Address Book already exists.")
         else:
             self.address_books[name] = AddressBook()
-            logger.info(f"Address Book '{name}' created successfully.")
+            print(f"Address Book '{name}' created.")
 
     def select_address_book(self):
         """
-        Function: Select an Address Book from the available Address Books.
+        Function: Select an Address Book by name for management.
         
         Parameter: self
         
-        Returns: AddressBook instance
+        Returns: AddressBook or None
         """
-        if not self.address_books:
-            print("No Address Books available.")
-            return None
-
-        print("Available Address Books:")
-        for index, name in enumerate(self.address_books, start=1):
-            print(f"{index}. {name}")
-
-        choice = input("Enter the number of the Address Book you want to manage: ")
-        try:
-            index = int(choice) - 1
-            name = list(self.address_books.keys())[index]
-            return self.address_books[name]
-        except (ValueError, IndexError):
-            print("Invalid choice. Please try again.")
-            return None
+        name = input("Enter the name of the Address Book you want to manage: ")
+        return self.address_books.get(name, None)
 
     def manage(self):
         """
-        Function: Handles user interactions for managing Address Books and their contacts.
+        Function: Manage the Address Book system, providing options to create or select Address Books.
         
-        Parameter: None
+        Parameter: self
         
         Returns: None
         """
         while True:
-            print("\nMenu:")
-            print("1. Create a new Address Book")
-            print("2. Manage an existing Address Book")
+            print("\nAddress Book Manager Menu:")
+            print("1. Create Address Book")
+            print("2. Manage Existing Address Book")
             print("3. Exit")
             choice = input("Enter your choice: ")
 
@@ -268,15 +252,13 @@ class AddressBookManager:
                 address_book = self.select_address_book()
                 if address_book:
                     address_book.manage()
+                else:
+                    print("Address Book not found.")
             elif choice == '3':
-                print("Exiting Address Book Manager")
                 break
             else:
                 print("Invalid choice. Please try again.")
 
-def main():
+if __name__ == "__main__":
     manager = AddressBookManager()
     manager.manage()
-
-if __name__ == "__main__":
-    main()
