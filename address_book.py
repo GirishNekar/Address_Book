@@ -3,13 +3,13 @@
 @Date: 2024-09-09
 @Last Modified by: Girish
 @Last Modified time: 2024-09-09
-@Title : Ability to add and edit a Contact in Address Book
+@Title : Ability to add, edit, and delete a Contact in Address Book
 """
 
 import re
 import mylogging as log
 
-logger = log.logger_init('UC3')
+logger = log.logger_init('UC4')
 
 class ContactPerson:
     """
@@ -29,10 +29,7 @@ class ContactPerson:
     def __str__(self):
         return (
             f"Name: {self.first_name} {self.last_name}\n"
-            f"Address: {self.address}"
-            f"City: {self.city}\n"
-            f"State: {self.state}\n"
-            f"Zip code: {self.zip_code}\n"
+            f"Address: {self.address}, {self.city}, {self.state} - {self.zip_code}\n"
             f"Phone Number: {self.phone_number}\n"
             f"Email: {self.email}"
         )
@@ -94,7 +91,7 @@ class AddressBook:
                 print("\nCurrent details of the contact:")
                 print(contact)
                 print("\nEnter new details (leave blank to keep current value):")
-                new_first_name = input(f"New Last Name (Current: {contact.last_name}): ") or contact.last_name
+
                 new_last_name = input(f"New Last Name (Current: {contact.last_name}): ") or contact.last_name
                 new_address = input(f"New Address (Current: {contact.address}): ") or contact.address
                 new_city = input(f"New City (Current: {contact.city}): ") or contact.city
@@ -104,7 +101,6 @@ class AddressBook:
                 new_email = input(f"New Email (Current: {contact.email}): ") or contact.email
 
                 # Update the contact with new details
-                contact.first_name = new_first_name
                 contact.last_name = new_last_name
                 contact.address = new_address
                 contact.city = new_city
@@ -114,6 +110,22 @@ class AddressBook:
                 contact.email = new_email
 
                 logger.info(f"Contact {first_name} updated successfully.")
+                return
+        print("Contact not found.")
+
+    def delete_contact(self):
+        """
+        Function: Delete a contact from the Address Book based on their first name.
+        
+        Parameter: self
+        
+        Returns: None
+        """
+        first_name = input("Enter the first name of the contact you want to delete: ")
+        for index, contact in enumerate(self.contacts):
+            if contact.first_name == first_name:
+                del self.contacts[index]
+                logger.info(f"Contact {first_name} deleted successfully.")
                 return
         print("Contact not found.")
 
@@ -147,11 +159,12 @@ class AddressBook:
         Returns: None
         """
         while True:
-            print("\nManage Address Book:")
+            print("\nMenu:")
             print("1. Add a new contact")
             print("2. Display all contacts")
             print("3. Edit an existing contact")
-            print("4. Exit")
+            print("4. Delete a contact")
+            print("5. Exit")
             choice = input("Enter your choice: ")
 
             if choice == '1':
@@ -161,6 +174,8 @@ class AddressBook:
             elif choice == '3':
                 self.edit_contact()
             elif choice == '4':
+                self.delete_contact()
+            elif choice == '5':
                 print("Exiting the Address Book")
                 break
             else:
