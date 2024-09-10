@@ -3,13 +3,13 @@
 @Date: 2024-09-09
 @Last Modified by: Girish
 @Last Modified time: 2024-09-09
-@Title : Ability to add, edit, delete, and manage multiple Contacts in Address Book and search and view based on the city and state and sort the entries in theaddress book alphabetically by Person’s name
+@Title : Ability to  sort the entries in the address book alphabetically by Person’s name and City ,State or Zip
 """
 
 import re
 import mylogging as log
 
-logger = log.logger_init('UC11')
+logger = log.logger_init('UC12')
 
 class ContactPerson:
     """
@@ -189,20 +189,25 @@ class AddressBook:
         else:
             print(f"No contacts found in state '{state}'.")
 
-    def sort_contacts_by_name(self):
+    def sort_contacts(self, sort_by):
         """
-        Function: Sort and display the contacts alphabetically by first name.
+        Function: Sort and display the contacts by the specified attribute.
         
-        Parameter: self
+        Parameter: 
+        - sort_by (str): The attribute to sort the contacts by ('name', 'city', 'state', 'zip').
         
         Returns: None
         """
         if not self.contacts:
             print("Address Book is empty.")
         else:
-            sorted_contacts = sorted(self.contacts.values(), key=lambda contact: contact.first_name.lower())
-            for index, contact in enumerate(sorted_contacts, start=1):
-                print(f"\nContact {index}:\n{contact}")
+            valid_sort_options = {'name': 'first_name', 'city': 'city', 'state': 'state', 'zip': 'zip_code'}
+            if sort_by.lower() in valid_sort_options:
+                sorted_contacts = sorted(self.contacts.values(), key=lambda contact: getattr(contact, valid_sort_options[sort_by.lower()]).lower())
+                for index, contact in enumerate(sorted_contacts, start=1):
+                    print(f"\nContact {index}:\n{contact}")
+            else:
+                print(f"Invalid sort option '{sort_by}'. Please choose 'name', 'city', 'state', or 'zip'.")
 
     @staticmethod
     def validate_input(prompt, pattern, error_message):
@@ -222,10 +227,11 @@ class AddressBook:
                 return user_input
             else:
                 print(error_message)
+                logger.error(f"Validation failed: {error_message}")
 
     def manage(self):
         """
-        Function: Manage the Address Book system, providing options to add, display, edit, or delete contacts.
+        Function: Main method to manage the Address Book through a menu-driven interface.
         
         Parameter: self
         
@@ -241,9 +247,12 @@ class AddressBook:
             print("6. View Contacts by City")
             print("7. View Contacts by State")
             print("8. Sort Contacts by Name")
-            print("9. Exit")
+            print("9. Sort Contacts by City")
+            print("10. Sort Contacts by State")
+            print("11. Sort Contacts by Zip Code")
+            print("12. Exit")
             
-            choice = input("Choose an option (1-9): ").strip()
+            choice = input("Choose an option (1-12): ").strip()
             
             if choice == '1':
                 self.add_contact()
@@ -260,8 +269,14 @@ class AddressBook:
             elif choice == '7':
                 self.view_by_state()
             elif choice == '8':
-                self.sort_contacts_by_name()
+                self.sort_contacts('name')
             elif choice == '9':
+                self.sort_contacts('city')
+            elif choice == '10':
+                self.sort_contacts('state')
+            elif choice == '11':
+                self.sort_contacts('zip')
+            elif choice == '12':
                 print("Exiting Address Book.")
                 break
             else:
