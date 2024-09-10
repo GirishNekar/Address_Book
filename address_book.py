@@ -3,13 +3,13 @@
 @Date: 2024-09-09
 @Last Modified by: Girish
 @Last Modified time: 2024-09-09
-@Title : Ability to add, edit, delete, and manage multiple Contacts in Address Book and search and view based on the city and state
+@Title : Ability to add, edit, delete, and manage multiple Contacts in Address Book and search and view based on the city and state and sort the entries in theaddress book alphabetically by Person’s name
 """
 
 import re
 import mylogging as log
 
-logger = log.logger_init('UC10')
+logger = log.logger_init('UC11')
 
 class ContactPerson:
     """
@@ -131,7 +131,8 @@ class AddressBook:
 
             # Update contact details
             updated_contact = ContactPerson(new_first_name, new_last_name, new_address, new_city, new_state, new_zip_code, new_phone_number, new_email)
-            self.contacts[first_name] = updated_contact
+            del self.contacts[first_name]  # Remove the old contact entry
+            self.contacts[new_first_name] = updated_contact  # Add the updated contact
 
             logger.info(f"Contact {first_name} updated successfully.")
         else:
@@ -151,7 +152,6 @@ class AddressBook:
             logger.info(f"Contact {first_name} deleted successfully.")
         else:
             print("Contact not found.")
-
 
     def view_by_city(self):
         """
@@ -189,6 +189,21 @@ class AddressBook:
         else:
             print(f"No contacts found in state '{state}'.")
 
+    def sort_contacts_by_name(self):
+        """
+        Function: Sort and display the contacts alphabetically by first name.
+        
+        Parameter: self
+        
+        Returns: None
+        """
+        if not self.contacts:
+            print("Address Book is empty.")
+        else:
+            sorted_contacts = sorted(self.contacts.values(), key=lambda contact: contact.first_name.lower())
+            for index, contact in enumerate(sorted_contacts, start=1):
+                print(f"\nContact {index}:\n{contact}")
+
     @staticmethod
     def validate_input(prompt, pattern, error_message):
         """
@@ -223,11 +238,13 @@ class AddressBook:
             print("3. Display Contacts")
             print("4. Edit Contact")
             print("5. Delete Contact")
-            print("6. View Contacts by City and total number of persons in that City")
-            print("7. View Contacts by State and totoal number of persons in that State")
-            print("8. Go Back")
-            choice = input("Enter your choice: ")
-
+            print("6. View Contacts by City")
+            print("7. View Contacts by State")
+            print("8. Sort Contacts by Name")
+            print("9. Exit")
+            
+            choice = input("Choose an option (1-9): ").strip()
+            
             if choice == '1':
                 self.add_contact()
             elif choice == '2':
@@ -243,9 +260,14 @@ class AddressBook:
             elif choice == '7':
                 self.view_by_state()
             elif choice == '8':
+                self.sort_contacts_by_name()
+            elif choice == '9':
+                print("Exiting Address Book.")
                 break
             else:
-                print("Invalid choice. Please try again.")
+                print("Invalid choice. Please select a valid option.")
+                
+                
 class AddressBookManager:
     """
     Class: AddressBookManager
