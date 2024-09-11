@@ -11,6 +11,7 @@ import mylogging as log
 import os
 import ast
 import csv
+import json
 
 logger = log.logger_init('UC14')
 
@@ -214,9 +215,9 @@ class AddressBook:
                 
 
 
-    def save_to_csv_file(self, file_name=None):
+    def save_to_json_file(self, file_name=None):
         """
-        Function: Save all contacts in the Address Book to a CSV file.
+        Function: Save all contacts in the Address Book to a JSON file.
     
         Parameters: 
         file_name (str): The name of the file where contacts will be saved. If None, user will be prompted to enter a path.
@@ -224,30 +225,26 @@ class AddressBook:
         Returns: None
         """
         if file_name is None:
-            file_name = input("Enter the path where the contacts should be saved (default: 'contacts.csv'): ") or "contacts.csv"
+            file_name = input("Enter the path where the contacts should be saved (default: 'contacts.json'): ") or "contacts.json"
     
-    # Define the CSV file header
-        header = ['first_name', 'last_name', 'address', 'city', 'state', 'zip_code', 'phone_number', 'email']
+   
+            contacts_list = [
+            {
+            'first_name': contact.first_name,
+            'last_name': contact.last_name,
+            'address': contact.address,
+            'city': contact.city,
+            'state': contact.state,
+            'zip_code': contact.zip_code,
+            'phone_number': contact.phone_number,
+            'email': contact.email
+            }
+            for contact in self.contacts.values()
+    ]
     
         try:
-            with open(file_name, 'w', newline='') as file:
-                writer = csv.DictWriter(file, fieldnames=header)
-            
-                writer.writeheader()
-            
-                for contact in self.contacts.values():
-                # Convert contact attributes to a dictionary
-                    contact_dict = {
-                    'first_name': contact.first_name,
-                    'last_name': contact.last_name,
-                    'address': contact.address,
-                    'city': contact.city,
-                    'state': contact.state,
-                    'zip_code': contact.zip_code,
-                    'phone_number': contact.phone_number,
-                    'email': contact.email
-                    }
-                    writer.writerow(contact_dict)
+            with open(file_name, 'w') as file:
+                json.dump(contacts_list, file, indent=4)
         
             print(f"All contacts have been saved to {file_name}.")
             logger.info(f"Contacts saved to file {file_name}.")
@@ -298,43 +295,6 @@ class AddressBook:
             logger.error(f"An error occurred while loading contacts from {file_name}: {str(e)}")
 
 
-# def load_from_file(self, file_name="address_book.txt"):
-#     """
-#     Function: Load contacts from a text file into the Address Book.
-    
-#     Parameters: 
-#     - file_name (str): The name of the file from which contacts will be loaded.
-    
-#     Returns: None
-#     """
-#     # Check if the file exists
-#     if not os.path.exists(file_name):
-#         print(f"{file_name} not found. No contacts loaded.")
-#         logger.error(f"File {file_name} not found. No contacts loaded.")
-#         return
-
-#     try:
-#         with open(file_name, 'r') as file:
-#             content = file.read().strip().split("\n\n")
-#             for entry in content:
-#                 lines = entry.split('\n')
-#                 if len(lines) >= 4:
-#                     first_name, last_name = lines[0].replace("Name: ", "").split()
-#                     address = lines[1].replace("Address: ", "")
-#                     city, state_zip = address.rsplit(',', 1)
-#                     state, zip_code = state_zip.split('-')
-#                     zip_code = zip_code.strip()
-#                     phone_number = lines[2].replace("Phone Number: ", "")
-#                     email = lines[3].replace("Email: ", "")
-#                     contact = ContactPerson(first_name, last_name, address, city.strip(), state.strip(), zip_code, phone_number, email)
-#                     self.contacts[first_name] = contact
-#         print(f"Contacts loaded from {file_name}.")
-#         logger.info(f"Contacts loaded from file {file_name}.")
-#     except Exception as e:
-#         print(f"An error occurred while loading contacts: {str(e)}")
-#         logger.error(f"An error occurred while loading contacts from {file_name}: {str(e)}")
-
-
 
     @staticmethod
     def validate_input(prompt, pattern, error_message):
@@ -378,7 +338,7 @@ class AddressBook:
             print("10. Sort Contacts by State")
             print("11. Sort Contacts by Zip Code")
             print("12. Load Contacts by input file")
-            print("13. Save Contacts to text_ file")
+            print("13. Save Contacts to json_ file")
             print("14. Exit")
             
             choice = input("Choose an option (1-14): ").strip()
@@ -408,7 +368,7 @@ class AddressBook:
             elif choice == '12':
                 self.load_from_file()
             elif choice == '13':
-                self.save_to_csv_file()
+                self.save_to_json_file()
             elif choice == '14':
                 print("Exiting Address Book.")
                 break
