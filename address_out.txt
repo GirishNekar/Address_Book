@@ -1,0 +1,25 @@
+Name: John Doe
+Address: 123 Elm St, Springfield, IL - 62704
+Phone Number: +1 5551234567
+Email: johndoe@example.com
+
+Name: Jane Smith
+Address: 456 Oak St, Springfield, IL - 62704-1234
+Phone Number: +44 2079460958
+Email: janesmith@example.com
+
+Name: Alice Johnson
+Address: 789 Pine St, Lincoln, NE - 68508
+Phone Number: +91 9876543210
+Email: alicejohnson@example.com
+
+Name: Bob Brown
+Address: 101 Maple St, Omaha, NE - 68104-5678
+Phone Number: +1 4028765432
+Email: bobbrown@example.com
+
+Name: Gir Nek
+Address: kjfs, kjbfs, jhbfd - 767676
+Phone Number: 87 9898989898
+Email: gkskfd34@gh.com
+
