@@ -3,15 +3,16 @@
 @Date: 2024-09-09
 @Last Modified by: Girish
 @Last Modified time: 2024-09-09
-@Title : Ability to  sort the entries in the address book alphabetically by Person’s name and City ,State or Zip
+@Title : Ability to  sort the entries in the address book alphabetically by Person’s name and City ,State or Zip and Write contacts to CSV file
 """
 
 import re
 import mylogging as log
 import os
 import ast
+import csv
 
-logger = log.logger_init('UC12')
+logger = log.logger_init('UC14')
 
 class ContactPerson:
     """
@@ -211,9 +212,11 @@ class AddressBook:
             else:
                 print(f"Invalid sort option '{sort_by}'. Please choose 'name', 'city', 'state', or 'zip'.")
                 
-    def save_to_file(self, file_name=None):
+
+
+    def save_to_csv_file(self, file_name=None):
         """
-        Function: Save all contacts in the Address Book to a text file.
+        Function: Save all contacts in the Address Book to a CSV file.
     
         Parameters: 
         file_name (str): The name of the file where contacts will be saved. If None, user will be prompted to enter a path.
@@ -221,12 +224,38 @@ class AddressBook:
         Returns: None
         """
         if file_name is None:
-            file_name = input("Enter the path where the contacts should be saved (default: 'address_book.txt'): ") or "address_book.txt"
+            file_name = input("Enter the path where the contacts should be saved (default: 'contacts.csv'): ") or "contacts.csv"
+    
+    # Define the CSV file header
+        header = ['first_name', 'last_name', 'address', 'city', 'state', 'zip_code', 'phone_number', 'email']
+    
+        try:
+            with open(file_name, 'w', newline='') as file:
+                writer = csv.DictWriter(file, fieldnames=header)
+            
+                writer.writeheader()
+            
+                for contact in self.contacts.values():
+                # Convert contact attributes to a dictionary
+                    contact_dict = {
+                    'first_name': contact.first_name,
+                    'last_name': contact.last_name,
+                    'address': contact.address,
+                    'city': contact.city,
+                    'state': contact.state,
+                    'zip_code': contact.zip_code,
+                    'phone_number': contact.phone_number,
+                    'email': contact.email
+                    }
+                    writer.writerow(contact_dict)
         
-        with open(file_name, 'w') as file:
-            for contact in self.contacts.values():
-                file.write(str(contact) + "\n\n")
-        logger.info(f"Contacts saved to file {file_name}.")
+            print(f"All contacts have been saved to {file_name}.")
+            logger.info(f"Contacts saved to file {file_name}.")
+    
+        except Exception as e:
+            print(f"An error occurred while saving contacts: {str(e)}")
+            logger.error(f"An error occurred while saving contacts to file {file_name}: {str(e)}")
+
         
         
 
@@ -352,7 +381,7 @@ class AddressBook:
             print("13. Save Contacts to text_ file")
             print("14. Exit")
             
-            choice = input("Choose an option (1-12): ").strip()
+            choice = input("Choose an option (1-14): ").strip()
             
             if choice == '1':
                 self.add_contact()
@@ -379,7 +408,7 @@ class AddressBook:
             elif choice == '12':
                 self.load_from_file()
             elif choice == '13':
-                self.save_to_file()
+                self.save_to_csv_file()
             elif choice == '14':
                 print("Exiting Address Book.")
                 break
