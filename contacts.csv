@@ -1,0 +1,5 @@
+first_name,last_name,address,city,state,zip_code,phone_number,email
+John,Doe,123 Elm St,Springfield,IL,62704,+1 5551234567,johndoe@example.com
+Jane,Smith,456 Oak St,Springfield,IL,62704-1234,+44 2079460958,janesmith@example.com
+Alice,Johnson,789 Pine St,Lincoln,NE,68508,+91 9876543210,alicejohnson@example.com
+Bob,Brown,101 Maple St,Omaha,NE,68104-5678,+1 4028765432,bobbrown@example.com14
